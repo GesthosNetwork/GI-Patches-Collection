@@ -1,0 +1,9 @@
+{
+  "enable_console": true,
+  "enable_redirect_hooks": true,
+  "redirect_url": "http://127.0.0.1:21000",
+  "whitelist_domains": [
+    "autopatchhk.yuanshen.com",
+    "autopatchcn.yuanshen.com"
+  ]
+}

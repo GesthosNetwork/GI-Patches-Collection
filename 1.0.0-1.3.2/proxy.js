@@ -4,8 +4,8 @@ function main(stage, parameters) {
         return;
     }
 
-    if (!parameters.alwaysIgnoreDomains || !Array.isArray(parameters.alwaysIgnoreDomains)) {
-        console.log("alwaysIgnoreDomains parameter missing or invalid! Ensure it's an array in your config.");
+    if (!parameters.whitelistDomains || !Array.isArray(parameters.whitelistDomains)) {
+        console.log("whitelistDomains parameter missing or invalid! Ensure it's an array in your config.");
         return;
     }
 
@@ -16,12 +16,13 @@ function main(stage, parameters) {
     console.log("Found Uri::ctor at " + UriCtorPtr);
 
     RedirectCallback.targetHost = parameters.redirectHost;
-    RedirectCallback.alwaysIgnoreDomains = parameters.alwaysIgnoreDomains;
+    RedirectCallback.whitelistDomains = parameters.whitelistDomains;
 
     Interceptor.attach(UnityWebRequestSetUrlPtr, RedirectCallback);
     Interceptor.attach(UriCtorPtr, RedirectCallback);
 
     console.log("Attached successfully, will redirect all requests to: " + parameters.redirectHost);
+    console.log("Using whitelistDomains: " + JSON.stringify(parameters.whitelistDomains));
 
     const BrowserLoadURL = Helpers.FindMethodImpl("ZFBrowser.dll", "ZenFulcrum.EmbeddedBrowser", "Browser", "LoadURL", 2);
 
@@ -31,7 +32,7 @@ function main(stage, parameters) {
                 var requestUrl = args[1].readCSharpString();
                 var hostname = extractHostname(requestUrl);
 
-                for (const domain of RedirectCallback.alwaysIgnoreDomains) {
+                for (const domain of RedirectCallback.whitelistDomains) {
                     if (hostname.endsWith(domain)) {
                         console.log(`[Fetching]: ${requestUrl}`);
                         return;
@@ -57,7 +58,7 @@ const RedirectCallback = {
         }
 
         var hostname = extractHostname(requestUrl);
-        for (const domain of RedirectCallback.alwaysIgnoreDomains) {
+        for (const domain of RedirectCallback.whitelistDomains) {
             if (hostname.endsWith(domain)) {
                 console.log(`[Fetching]: ${requestUrl}`);
                 return;
@@ -98,18 +99,15 @@ const Helpers = {
 const Il2cppApiWrap = {
     AllocateString(value) {
         const pValue = Memory.allocUtf16String(value);
-
         return this.CallApiFunction('il2cpp_string_new_utf16', 'pointer', ['pointer', 'int'], [pValue, value.length]);
     },
     GetClassMethodByName(il2cppClass, name, argsCount) {
         const pName = Memory.allocUtf8String(name);
-
         return this.CallApiFunction('il2cpp_class_get_method_from_name', 'pointer', ['pointer', 'pointer', 'int'], [il2cppClass, pName, argsCount]);
     },
     GetClassByName(il2cppImage, namespace, name) {
         const pNamespace = Memory.allocUtf8String(namespace);
         const pName = Memory.allocUtf8String(name);
-
         return this.CallApiFunction('il2cpp_class_from_name', 'pointer', ['pointer', 'pointer', 'pointer'], [il2cppImage, pNamespace, pName]);
     },
     GetImageByName(name) {
