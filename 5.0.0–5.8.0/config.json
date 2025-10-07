@@ -1,7 +1,13 @@
 {
-  "enable_console": true,
-  "enable_redirect_hooks": true,
   "redirect_url": "http://127.0.0.1:21000",
+  "enable_console": true,
+  "parameters": {
+    "redirect_hooks": true,
+    "ptr_to_string_ansi": true,
+    "set_custom_property_float": true,
+    "registry_cleanup": true,
+    "sdk_util_rsa_encrypt": true
+  },
   "whitelist_domains": [
     "autopatchhk.yuanshen.com",
     "autopatchcn.yuanshen.com"

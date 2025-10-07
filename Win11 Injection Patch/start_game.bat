@@ -1,0 +1,1 @@
+start launcher.exe ./ ./mhynot2.dll ./libwinpthread-1.dll
